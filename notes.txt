@@ -1,0 +1,25 @@
+Props:
+
+multiple - is it allowed to upload multiple files (default is false);
+
+accept - array of file types (mime types) allowed to upload;
+
+maxSize - maximum total files size allowed to upload;
+
+getFiles - method, that returns array of attached files;
+
+onChange(error, files) - callback, that is called after files were attached.
+
+Use case example:
+
+
+<div {...getRootProps()}>This is drag and drop area.</div>
+
+// This is input to upload files
+<input {...getInputProps()} />
+
+
+<div {...getRootProps()}>
+  <input {...getInputProps()} />
+  This is drag and drop area and input to upload files.
+</div>
