@@ -38,10 +38,26 @@ export interface UploaderHookParams {
 
 type UploaderHook = (params: UploaderHookParams) => UploaderHookAPI;
 
+/**
+ * Provides access:
+ *
+ * - to attached files by DnD or with help of input[type="file"];
+ * - to validation errors;
+ * - to the api to manage the attached file.
+ *
+ * @param {Object} [config] Configuration options object.
+ * @param {number} [config.maxSize] Maximum bytes of data allowed to upload.
+ * @param {string} [config.accept] Files types allowed to upload.
+ * @param {boolean} [config.multiple=false] To allow or not multiple files upload.
+ * @param {onAttach} [config.onAttach=() => {}] To allow or not multiple files upload.
+ *
+ * @returns {Object} api Api to manage attached files.
+ */
+
 export const useUploaderHook: UploaderHook = ({
   maxSize,
-  multiple = false,
   accept,
+  multiple = false,
   onAttach: onAttachCb = () => {}
 }) => {
   const [acceptedFilesData, setAcceptedFilesData] = useState<AcceptedFilesData>(

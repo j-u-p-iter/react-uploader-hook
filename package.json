@@ -2,7 +2,9 @@
   "name": "@j.u.p.iter/react-uploader-hook",
   "version": "0.0.0-semantically-released",
   "description": "React hook to build Upload components",
-  "main": "index.js",
+  "main": "dist/lib/react-uploader-hook.cjs.js",
+  "module": "dist/lib/react-uploader-hook.esm.js",
+  "umd:main": "dist/lib/react-uploader-hook.umd.min.js",
   "repository": "git@github.com:j-u-p-iter/react-uploader-hook.git",
   "author": "Leontyev Kirill <pn79122821224@gmail.com> (j.u.p.iter)",
   "license": "MIT",
@@ -21,6 +23,7 @@
     "@testing-library/react": "9.4.0",
     "@types/react": "^16.8.8",
     "@types/react-dom": "^16.8.3",
+    "jsdoc-to-markdown": "^6.0.1",
     "parcel-bundler": "^1.12.4",
     "react": "^16.8.2",
     "react-dom": "^16.8.2"
