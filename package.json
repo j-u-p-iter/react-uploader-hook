@@ -1,6 +1,6 @@
 {
   "name": "@j.u.p.iter/react-uploader-hook",
-  "version": "0.0.2",
+  "version": "0.0.0-semantically-released",
   "description": "React hook to build Upload components",
   "main": "index.js",
   "repository": "git@github.com:j-u-p-iter/react-uploader-hook.git",
