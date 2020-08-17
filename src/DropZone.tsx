@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { useUploaderHook, UploaderHookParams } from './uploaderHook';
+import { UploaderHookParams, useUploaderHook } from "./uploaderHook";
 
 type FC<T> = React.FC<T>;
 type ReactNode = React.ReactNode;
