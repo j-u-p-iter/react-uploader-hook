@@ -96,6 +96,20 @@ describe("uploaderHook", () => {
       );
     };
 
+    const RemovedFilesUrls = ({ removedFilesUrls }) => {
+      return (
+        <ul>
+          {removedFilesUrls.map(({ url }) => {
+            return (
+              <li key={url} data-testid="removedFileUrl">
+                {url}
+              </li>
+            );
+          })}
+        </ul>
+      );
+    };
+
     renderComponent = (props = {}) => {
       return render(
         <DropZone {...props}>
@@ -104,6 +118,7 @@ describe("uploaderHook", () => {
             getInputProps,
             acceptedFilesData,
             rejectedFilesData,
+            removedFilesUrls,
             deleteFile,
             deleteAllFiles
           }) => {
@@ -120,6 +135,8 @@ describe("uploaderHook", () => {
                 <Files acceptedFilesData={acceptedFilesData} />
 
                 <Errors rejectedFilesData={rejectedFilesData} />
+
+                <RemovedFilesUrls removedFilesUrls={removedFilesUrls} />
 
                 <button onClick={() => deleteFile(0)}>Delete file</button>
 
@@ -782,12 +799,50 @@ describe("uploaderHook", () => {
   describe("uploadedFiles", () => {
     it("renders uploaded files properly", () => {
       const { getAllByTestId } = renderComponent({
+        uploadedFilesUrls: ["http://uploadedFile.com"]
+      });
+
+      expect(getAllByTestId("uploadedFile").length).toBe(1);
+    });
+
+    it("renders only one uploaded file if {multiple} equals to [false]", () => {
+      const { getAllByTestId } = renderComponent({
         uploadedFilesUrls: [
           "http://uploadedFile.com",
           "http://oneMoreUploadedFile.com"
         ]
       });
 
+      expect(getAllByTestId("uploadedFile").length).toBe(1);
+    });
+
+    it("renders all uploaded files with {multiple} equals to [true]", () => {
+      const { getAllByTestId } = renderComponent({
+        uploadedFilesUrls: [
+          "http://uploadedFile.com",
+          "http://oneMoreUploadedFile.com"
+        ],
+        multiple: true
+      });
+
+      expect(getAllByTestId("uploadedFile").length).toBe(2);
+    });
+
+    it("attaches files properly to the previously uploaded files", () => {
+      const file = createFile({ name: "super.pdf", size: 1200 });
+      const { getAllByTestId, getByTestId } = renderComponent({
+        uploadedFilesUrls: [
+          "http://uploadedFile.com",
+          "http://oneMoreUploadedFile.com"
+        ],
+        multiple: true
+      });
+
+      fireEvent.change(getByTestId(testIds.INPUT), {
+        target: { files: [file] }
+      });
+
+      expect(getAllByTestId("filePreview").length).toBe(1);
       expect(getAllByTestId("uploadedFile").length).toBe(2);
     });
 
@@ -796,17 +851,20 @@ describe("uploaderHook", () => {
         uploadedFilesUrls: [
           "http://uploadedFile.com",
           "http://oneMoreUploadedFile.com"
-        ]
+        ],
+        multiple: true
       });
 
       expect(queryAllByTestId("uploadedFile").length).toBe(2);
 
       fireEvent.click(getByText("Delete file"));
 
+      expect(queryAllByTestId("removedFileUrl").length).toBe(1);
       expect(queryAllByTestId("uploadedFile").length).toBe(1);
 
       fireEvent.click(getByText("Delete all files"));
 
+      expect(queryAllByTestId("removedFileUrl").length).toBe(2);
       expect(queryAllByTestId("uploadedFile").length).toBe(0);
     });
   });

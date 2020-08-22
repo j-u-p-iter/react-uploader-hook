@@ -62,8 +62,14 @@ type UploaderHook = (params: UploaderHookParams) => UploaderHookAPI;
  * @returns {Object} api Api to manage attached files.
  */
 
-const urlsToAcceptedFilesData = urls => {
-  return urls.map(url => ({ url }));
+const urlsToAcceptedFilesData = (urls, multiple) => {
+  const filesData = urls.map(url => ({ url }));
+
+  if (!filesData.length) {
+    return [];
+  }
+
+  return multiple ? filesData : [filesData[0]];
 };
 
 export const useUploaderHook: UploaderHook = ({
@@ -74,7 +80,7 @@ export const useUploaderHook: UploaderHook = ({
   uploadedFilesUrls = []
 }) => {
   const [acceptedFilesData, setAcceptedFilesData] = useState<AcceptedFilesData>(
-    () => urlsToAcceptedFilesData(uploadedFilesUrls)
+    () => urlsToAcceptedFilesData(uploadedFilesUrls, multiple)
   );
   const [rejectedFilesData, setRejectedFilesData] = useState<RejectedFilesData>(
     []
