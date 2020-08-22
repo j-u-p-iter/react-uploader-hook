@@ -7,8 +7,8 @@ const UploaderExample = () => {
   const onAttach = () => {};
 
   return (
-    <DropZone onAttach={onAttach}>
-      {({ getRootProps, getInputProps, acceptedFilesData, deleteFile, deleteAllFiles }) => {
+    <DropZone onAttach={onAttach} multiple uploadedFilesUrls={['http://some-url.com']}>
+      {({ getRootProps, getInputProps, acceptedFilesData, deleteFile, deleteAllFiles, removedFilesUrls }) => {
         return (
           <>
             <div {...getRootProps()}>
@@ -16,16 +16,19 @@ const UploaderExample = () => {
             </div>
 
             <div>
-              {acceptedFilesData.map(({ preview }, index) => {
+              {acceptedFilesData.map(({ preview, url }, index) => {
                 return (
                   <div>
-                    <img src={preview} />
+                    <img src={url || preview} />
                     <div onClick={() => deleteFile(index)}>Delete file</div>
                   </div>
                 );
               })}
 
               {acceptedFilesData.length ? <button onClick={() => deleteAllFiles()}>Delete all</button> : null}
+
+              Deleted Files
+              {removedFilesUrls.length ? removedFilesUrls.map(({ url }) => <img src={url} />) : null}
             </div>
           </>
         )

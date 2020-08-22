@@ -79,11 +79,16 @@ describe("uploaderHook", () => {
     const Files = ({ acceptedFilesData }) => {
       return (
         <ul>
-          {acceptedFilesData.map(({ file, preview }) => {
+          {acceptedFilesData.map(({ file, preview, url }, index) => {
             return (
-              <li key={file.name}>
-                <div data-testid="acceptedFileName">{file.name}</div>
-                <img data-testid="filePreview" src={preview} />
+              <li key={index}>
+                {file ? (
+                  <div data-testid="acceptedFileName">{file.name}</div>
+                ) : null}
+                {preview ? (
+                  <img data-testid="filePreview" src={preview} />
+                ) : null}
+                {url ? <img data-testid="uploadedFile" src={url} /> : null}
               </li>
             );
           })}
@@ -771,6 +776,38 @@ describe("uploaderHook", () => {
       fireEvent.click(getByText("Delete all files"));
 
       expect(queryAllByTestId("acceptedFileName").length).toBe(0);
+    });
+  });
+
+  describe("uploadedFiles", () => {
+    it("renders uploaded files properly", () => {
+      const { getAllByTestId } = renderComponent({
+        uploadedFilesUrls: [
+          "http://uploadedFile.com",
+          "http://oneMoreUploadedFile.com"
+        ]
+      });
+
+      expect(getAllByTestId("uploadedFile").length).toBe(2);
+    });
+
+    it("deletes uploaded files properly", () => {
+      const { queryAllByTestId, getByText } = renderComponent({
+        uploadedFilesUrls: [
+          "http://uploadedFile.com",
+          "http://oneMoreUploadedFile.com"
+        ]
+      });
+
+      expect(queryAllByTestId("uploadedFile").length).toBe(2);
+
+      fireEvent.click(getByText("Delete file"));
+
+      expect(queryAllByTestId("uploadedFile").length).toBe(1);
+
+      fireEvent.click(getByText("Delete all files"));
+
+      expect(queryAllByTestId("uploadedFile").length).toBe(0);
     });
   });
 });

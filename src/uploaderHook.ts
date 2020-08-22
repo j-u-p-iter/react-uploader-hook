@@ -15,17 +15,25 @@ interface UploaderHookAPI {
   deleteAllFiles: () => void;
 }
 
-type AcceptedFilesData = Array<{
-  file: File;
-  preview: string;
-}>;
+type AcceptedFilesData = Array<
+  | {
+      file: File;
+      preview: string;
+    }
+  | {
+      url: string;
+    }
+>;
 
 type RejectedFilesData = Array<{
   file: File;
   errors: string[];
 }>;
 
+type RemovedFilesUrls = Array<{ url: string }>;
+
 export interface UploaderHookParams {
+  uploadedFilesUrls?: string[];
   multiple?: boolean;
   accept?: string;
   maxSize?: number;
@@ -54,17 +62,24 @@ type UploaderHook = (params: UploaderHookParams) => UploaderHookAPI;
  * @returns {Object} api Api to manage attached files.
  */
 
+const urlsToAcceptedFilesData = urls => {
+  return urls.map(url => ({ url }));
+};
+
 export const useUploaderHook: UploaderHook = ({
   maxSize,
   accept,
   multiple = false,
-  onAttach: onAttachCb = () => {}
+  onAttach: onAttachCb = () => {},
+  uploadedFilesUrls = []
 }) => {
   const [acceptedFilesData, setAcceptedFilesData] = useState<AcceptedFilesData>(
+    () => urlsToAcceptedFilesData(uploadedFilesUrls)
+  );
+  const [rejectedFilesData, setRejectedFilesData] = useState<RejectedFilesData>(
     []
   );
-
-  const [rejectedFilesData, setRejectedFilesData] = useState<RejectedFilesData>(
+  const [removedFilesUrls, setRemovedFilesUrls] = useState<RemovedFilesUrls>(
     []
   );
 
@@ -137,16 +152,28 @@ export const useUploaderHook: UploaderHook = ({
   };
 
   const deleteFile = (indexToDelete: number): void => {
+    const removedFile = acceptedFilesData[indexToDelete];
+
     const resultAcceptedFilesData = acceptedFilesData.filter(
       (_, index) => indexToDelete !== index
     );
 
     setAcceptedFilesData(resultAcceptedFilesData);
+
+    if ("url" in removedFile) {
+      setRemovedFilesUrls([...removedFilesUrls, removedFile]);
+    }
   };
 
   const deleteAllFiles = () => {
     setAcceptedFilesData([]);
     setRejectedFilesData([]);
+
+    const removedUploadedFiles = acceptedFilesData.filter(
+      data => "url" in data
+    ) as RemovedFilesUrls;
+
+    setRemovedFilesUrls([...removedFilesUrls, ...removedUploadedFiles]);
   };
 
   return {
@@ -155,6 +182,7 @@ export const useUploaderHook: UploaderHook = ({
     deleteFile,
     deleteAllFiles,
     acceptedFilesData,
-    rejectedFilesData
+    rejectedFilesData,
+    removedFilesUrls
   };
 };
